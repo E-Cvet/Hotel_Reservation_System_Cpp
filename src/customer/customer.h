@@ -1,95 +1,106 @@
-#pragma once
 #include <iostream>
 #include <vector>
-
 using namespace std;
 
-/*
-    Info to whoever is in charge of Customer.
-    The protected attributes of Customer can be whatever you want. That is for you to decide.
-    Please leave the public methods as they are, as they are needed in other functionalities.
-    Why the public functions are needed:
 
-    Customer(string name, string surname, string phone) - Constructor, this is how the object
-            is created. Every customer should have a name, surname and phone number by which
-            they will be identified in the system.
-    virtual double get_discount() - Every child Customer that you create should implement this
-            function. It returns the discount that that type of customer receives on the price
-            per night. Example: 0.2 means 20% off. This is used in Reservation to calculate
-            the final price.
-    virtual void display_info() - Every child Customer that you create should implement this
-            function to display information about that specific customer.
-    int get_id() - Returns the unique ID of the customer, used in Reservation to look up
-            who is making the booking.
-    string get_name() - Returns the name of the customer.
-    string get_phone() - Returns the phone number of the customer.
-
-    The two classes VipCustomer and GroupCustomer are just examples of possible customer types.
-    You are free to change the internal attributes and the discount logic however you like.
-    What you must not change is get_discount() and display_info() — these must be implemented
-    in every subclass as the rest of the system depends on them.
-
-    CustomerManager:
-    Same goes for here, the private attributes can be changed completely.
-    Please do not change the public method signatures, this is why they are needed:
-    void add_customer(Customer* customer) - Adds a customer to the system. Used in main.
-    Customer* find_customer(int id) - Looks up a customer by their ID. Used in Reservation
-            to find who is making a booking.
-    void list_all_customers() - Prints all customers in the system. Used in main.
-*/
-
+// Deklaracija za glavnata klasa CUSTOMER
 class Customer {
-protected:
+private:
+    // Privatni data members
     int customer_id;
     string name;
     string surname;
     string phone;
-    static int nextId;
+    static int nextId;  // Staticen member - delen so site objekti
 
 public:
-    Customer(string name, string surname, string phone);
-
-    virtual double get_discount() = 0;  // pure virtual — Customer is abstract
-    virtual void display_info() = 0;
-
+    // Konstruktor
+    Customer(string n, string s, string p);
+    
+    // Destruktor
+    ~Customer();
+    
+    // Get funckcii
     int get_id();
     string get_name();
     string get_phone();
-
-    virtual ~Customer() = default;
+    
+    // Display funkcija
+    void display_info();
 };
 
-/* These are some examples of VIP customers, they don't have to be like this. */
+//VIPCUSTOMER KLASA
+
 class VipCustomer : public Customer {
-    int loyalty_points;
+private:
+    int loyalty_points;  // extra member
 
 public:
-    VipCustomer(string name, string surname, string phone, int loyalty_points = 0);
-
-    double get_discount() override;
-    void display_info() override;
+    // Konstruktor
+    VipCustomer(string n, string s, string p, int points);
+    
+    // Destruktor
+    ~VipCustomer();
+    
+    // extra funkcii koi se potrebni
+    double get_discount();  // vraka 0.25 (popust)
+    void display_info();    // Override parent's display
     void add_points(int points);
 };
 
+//GROUPCUSTOMER KLASA
+
 class GroupCustomer : public Customer {
-    int groupSize;
+private:
+    int groupSize;  // extra member
 
 public:
-    GroupCustomer(string name, string phone, int groupSize);
-
-    double get_discount() override;
-    void display_info() override;
-    void get_group_size();
+    //Konstruktor
+    GroupCustomer(string name, string phone, int size);
+    
+    // Destruktor
+    ~GroupCustomer();
+    
+    // extra funkcii koi se potrebni
+    double get_discount();  // vraka 0.15
+    void display_info();    // Override parent's display
+    int get_group_size();
 };
 
-// ── CustomerManager ───────────────────────────────────────
+// CORPORATECUSTOMER KLASA
 
-class CustomerManager {
-    vector<Customer*> customers;
+class CorporateCustomer : public Customer {
+private:
+    string company_name;  // extra member
+    string tax_id;      // extra member
 
 public:
-    void add_customer(Customer* customer);
+    //Konstruktor
+    CorporateCustomer(string n, string s, string p, string company, string tax);
+    
+    // Destruktor
+    ~CorporateCustomer();
+    
+    // extra funkcii koi se potrebni
+    double get_discount();  // vraka 0.20
+    void display_info();    // Override parent's display
+};
+
+// CUSTOMERMANAGER KLASA
+
+class CustomerManager {
+private:
+    vector<Customer*> customers;  // Vektor za zacuvuvanje na pointeri od Customer
+
+public:
+    //Konstruktor
+    CustomerManager();
+    
+    // Destruktor
+    ~CustomerManager();
+    
+    // Funkcii
+    void add_customer(Customer* c);
     Customer* find_customer(int id);
     void list_all_customers();
-    ~CustomerManager();
 };
