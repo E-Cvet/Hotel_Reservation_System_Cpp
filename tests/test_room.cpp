@@ -3,13 +3,6 @@
 
 using namespace std;
 
-int main()
-{
-
-    return 0;
-}
-#include "src/room/room.h"
-
 int main() {
     RoomManager manager;
 
