@@ -1,13 +1,5 @@
 #include "room.h"
 
-// Example implementation of a function from the header file.
-string Room::get_room_number()
-{
-    return this->room_number;
-}
-
-#include "room.h"
-
 // room klasa
 
 Room::Room(int number, double price)
