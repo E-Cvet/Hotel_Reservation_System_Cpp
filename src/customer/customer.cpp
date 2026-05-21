@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../src/reservation/reservation.h"
+#include "customer.h"
 using namespace std;
 
 // inicijaliziranje na customer ID

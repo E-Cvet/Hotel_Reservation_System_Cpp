@@ -24,6 +24,8 @@ public:
     int get_id();
     string get_name();
     string get_phone();
+
+    virtual double get_discount() = 0;
     
     // Display funkcija
     void display_info();
