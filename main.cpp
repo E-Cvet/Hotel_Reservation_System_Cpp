@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
-#include <sys/stat.h>
+#include <filesystem>
 #include "src/reservation/reservation.h"
 #include "src/database/database.h"
 
 using namespace std;
-
+using namespace filesystem;
 
 int read_int();
 double read_double();
@@ -25,7 +25,7 @@ void reservation_menu(ReservationManager &resm, RoomManager &rm, CustomerManager
 int main()
 {
     const string data_dir = "data";
-    mkdir(data_dir.c_str(), 0755);
+    create_directory(data_dir);
 
     RoomManager rm;
     CustomerManager cm;
@@ -36,7 +36,7 @@ int main()
 
     while (true)
     {
-        system("clear");
+        system("cls");
         cout << "================================" << endl;
         cout << "   Hotel Reservation System" << endl;
         cout << "================================" << endl;
@@ -123,7 +123,7 @@ void section(string title)
 
 void add_room(RoomManager &rm)
 {
-    system("clear");
+    system("cls");
     section("Add Room");
     cout << "  1. Single Room" << endl;
     cout << "  2. Double Room" << endl;
@@ -179,7 +179,7 @@ void room_menu(RoomManager &rm)
 {
     while (true)
     {
-        system("clear");
+        system("cls");
         section("Room Management");
         cout << "  1. Add Room" << endl;
         cout << "  2. List All Rooms" << endl;
@@ -210,7 +210,7 @@ void room_menu(RoomManager &rm)
 
 void add_customer(CustomerManager &cm)
 {
-    system("clear");
+    system("cls");
     section("Add Customer");
     cout << "  1. VIP Customer       (25% discount)" << endl;
     cout << "  2. Corporate Customer (20% discount)" << endl;
@@ -305,7 +305,7 @@ void customer_menu(CustomerManager &cm)
 {
     while (true)
     {
-        system("clear");
+        system("cls");
         section("Customer Management");
         cout << "  1. Add Customer" << endl;
         cout << "  2. Find Customer by ID" << endl;
@@ -356,7 +356,7 @@ void customer_menu(CustomerManager &cm)
 
 void make_reservation(ReservationManager &resm, RoomManager &rm, CustomerManager &cm)
 {
-    system("clear");
+    system("cls");
     section("Make Reservation");
     cout << "  1. Standard    (base price)" << endl;
     cout << "  2. Early Bird  (extra 10% off)" << endl;
@@ -431,7 +431,7 @@ void reservation_menu(ReservationManager &resm, RoomManager &rm, CustomerManager
 {
     while (true)
     {
-        system("clear");
+        system("cls");
         section("Reservation Management");
         cout << "  1. Book a Room" << endl;
         cout << "  2. Cancel Reservation" << endl;
