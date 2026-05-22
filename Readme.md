@@ -1,5 +1,20 @@
 # Hotel Reservation System
-A console-based hotel management system written in C++ demonstrating core OOP principles — inheritance, polymorphism, and encapsulation — across three independently developed modules.
+
+A console-based hotel management system in C++. Built as a team project to practice OOP — the three main modules (rooms, customers, reservations) were each developed separately on feature branches and merged into master.
+
+---
+
+## What it does
+
+- Add rooms (single, double, suite) with a price per night
+- Add customers — VIP (25% discount), Corporate (20%), Group (15%)
+- Book a room for a customer with check-in and check-out dates, with three reservation types:
+  - **Standard** — base price with customer discount applied
+  - **Early Bird** — extra 10% off on top of the customer discount
+  - **Last Minute** — 20% surcharge added
+- Cancel a reservation and free up the room automatically
+- List all rooms, customers, and reservations
+- Everything is saved to disk and reloaded on the next run
 
 ---
 
@@ -8,129 +23,82 @@ A console-based hotel management system written in C++ demonstrating core OOP pr
 ```
 hotel-reservation/
 ├── src/
-│   ├── date/
-│   │   ├── date.h
-│   │   └── date.cpp
-│   ├── room/
-│   │   ├── room.h
-│   │   └── room.cpp
-│   ├── customer/
-│   │   ├── customer.h
-│   │   └── customer.cpp
-│   └── reservation/
-│       ├── reservation.h
-│       └── reservation.cpp
-├── tests/
-│   ├── test_room.cpp
-│   ├── test_customer.cpp
-│   └── test_reservation.cpp
-├── main.cpp
-├── Requirements.md
-└── README.md
+│   ├── date/           – Date struct, shared across all modules
+│   ├── room/           – Room hierarchy + RoomManager
+│   ├── customer/       – Customer hierarchy + CustomerManager
+│   ├── reservation/    – Reservation hierarchy + ReservationManager
+│   └── database/       – Reads and writes the .dat files
+├── data/               – rooms.dat, customers.dat, reservations.dat
+└── main.cpp
 ```
 
 ---
 
 ## Modules
 
-### Date — `src/date/`
-A shared utility used by all modules. Provides a simple `Date` struct with day, month, and year fields, and a `days_until()` method used to calculate the number of nights between check-in and check-out.
+**Date** (`src/date/`) — a simple struct with day, month, year and a `days_until()` method. Used everywhere to calculate number of nights.
 
-### Room — `src/room/`
-Manages the room hierarchy. `Room` is the abstract base class. Concrete types (`SingleRoom`, `DoubleRoom`, `Suite`) each implement `display_info()`. `RoomManager` holds all rooms in the system and exposes methods to add, find, and list them.
+**Room** (`src/room/`) — `Room` is the abstract base. `SingleRoom`, `DoubleRoom`, and `Suite` extend it and implement `display_info()`. `RoomManager` stores and looks up rooms.
 
-### Customer — `src/customer/`
-Manages the customer hierarchy. `Customer` is the abstract base class. Concrete types (`VipCustomer`, `CorporateCustomer`, `GroupCustomer`) each implement `get_discount()` and `display_info()`. `CustomerManager` holds all customers and exposes methods to add, find, and list them.
+**Customer** (`src/customer/`) — `Customer` is the abstract base. `VipCustomer`, `CorporateCustomer`, and `GroupCustomer` each override `get_discount()` and `display_info()`. `CustomerManager` stores and looks up customers.
 
-### Reservation — `src/reservation/`
-Manages the reservation hierarchy. `Reservation` is the abstract base class. Concrete types (`StandardReservation`, `EarlyBirdReservation`, `LastMinuteReservation`) each implement `calculate_total()` and `display_info()`. `ReservationManager` links the other two modules together and handles booking and cancellation.
+**Reservation** (`src/reservation/`) — `Reservation` is the abstract base. `StandardReservation`, `EarlyBirdReservation`, and `LastMinuteReservation` each implement `calculate_total()` and `display_info()`. `ReservationManager` links rooms and customers together and handles all booking logic.
 
----
-
-## Workflow
-Each team member works on their own branch to keep changes isolated and avoid conflicts on `master`.
-
-**1. Clone the repository**
-```bash
-git clone <repository-url>
-cd hotel-reservation
-```
-
-**2. Create a branch for your module**
-Name your branch after the module you own:
-```bash
-git checkout -b feature/room
-# or
-git checkout -b feature/customer
-# or
-git checkout -b feature/reservation
-```
-
-**3. Implement your module**
-Work only within your assigned files (see [Module ownership](#module-ownership)). Do not modify another person's module files. If you need a change in a shared file (`src/date/`, `main.cpp`), discuss it with the team first.
-
-**4. Commit and push your changes**
-```bash
-git add src/room/ tests/test_room.cpp   # adjust paths to your module
-git commit -m "feat(room): implement SingleRoom and RoomManager"
-git push origin feature/room
-```
-
-**5. Open a pull request to `master`**
-Go to the repository on GitHub and open a pull request from your feature branch into `master`. In the PR description, briefly describe what you implemented and how to test it. At least one other team member should review and approve before merging.
-
-> Keep your branch up to date with `master` by running `git pull origin master` periodically to catch any shared-file changes early.
-
+**Database** (`src/database/`) — a separate class that handles all file I/O. The managers themselves know nothing about files. On startup it reads the three `.dat` files; on exit it writes them back.
 
 ---
 
 ## Compiling
 
-### Full program
 ```bash
-g++ main.cpp src/date/date.cpp src/room/room.cpp src/customer/customer.cpp src/reservation/reservation.cpp -o hotel
+g++ main.cpp src/date/date.cpp src/room/room.cpp src/customer/customer.cpp src/reservation/reservation.cpp src/database/database.cpp -o hotel
 ./hotel
 ```
 
-### Individual module tests
-Each module has its own test file with its own `main()`. Compile and run them independently — no conflicts with `main.cpp`.
+---
 
-```bash
-# Test rooms
-g++ tests/test_room.cpp src/date/date.cpp src/room/room.cpp -o test_room
-./test_room
+## Data files
 
-# Test customers
-g++ tests/test_customer.cpp src/date/date.cpp src/customer/customer.cpp -o test_customer
-./test_customer
+The `data/` folder is created automatically on first run. The three files use a simple space-separated format:
 
-# Test reservations
-g++ tests/test_reservation.cpp src/date/date.cpp src/room/room.cpp src/customer/customer.cpp src/reservation/reservation.cpp -o test_reservation
-./test_reservation
 ```
+# rooms.dat
+SINGLE 101 2500 1       ← type, number, price, available (1/0)
+
+# customers.dat
+1001 VIP Aleksandar Petrov 070-123-456 750   ← id, type, fields...
+
+# reservations.dat
+STANDARD 1001 101 25/05/2026 28/05/2026 0   ← type, customer id, room, check-in, check-out, cancelled
+```
+
+You can edit these files directly — useful for seeding test data or fixing a mistake without going through the menu.
 
 ---
 
 ## Module ownership
 
-| Module      | Files                                      | Owner    |
-|-------------|--------------------------------------------|----------|
-| Room        | `src/room/`, `tests/test_room.cpp`         | Kiril    |
-| Customer    | `src/customer/`, `tests/test_customer.cpp` | Dona     |
-| Reservation | `src/reservation/`, `tests/test_reservation.cpp` | Ekaterina |
-| Shared      | `src/date/`, `main.cpp`, `README.md`       | Everyone |
+| Module      | Files                                | Owner     |
+|-------------|--------------------------------------|-----------|
+| Room        | `src/room/`                          | Kiril     |
+| Customer    | `src/customer/`                      | Dona      |
+| Reservation | `src/reservation/`                   | Ekaterina |
+| Shared      | `src/date/`, `src/database/`, `main.cpp` | Everyone  |
 
-> Each person is responsible for their own module folder and test file.  
-> Do not edit another person's module files.  
-> `main.cpp` should only be edited after agreeing with the whole team.
+Stick to your own module. If you need to change something in a shared file, talk to the others first.
 
 ---
 
-## Features
+## Git workflow
 
-- Add and list rooms by type (single, double, suite)
-- Add and list customers by type (standard, VIP, corporate, group)
-- Book a room for a customer with a check-in and check-out date
-- Automatically applies customer discount to the total price
-- Cancel a reservation and restore room availability
-- List all reservations in the system
+We use feature branches — one per module. Don't commit directly to master.
+
+```bash
+git checkout -b feature/reservation   # or room, customer
+# ... do your work ...
+git add src/reservation/
+git commit -m "feat: implement EarlyBirdReservation"
+git push origin feature/reservation
+```
+
+Then open a pull request to master and get at least one other person to review it before merging.
